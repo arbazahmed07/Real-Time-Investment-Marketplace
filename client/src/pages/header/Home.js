@@ -1,6 +1,7 @@
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
 import ChatIcon from "@mui/icons-material/Chat";
+import LogoutIcon from "@mui/icons-material/Logout";
 import AppBar from "@mui/material/AppBar";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
@@ -12,6 +13,7 @@ import NotificationDialog from "../notification/notificationDialog";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import * as React from "react";
+import Swal from 'sweetalert2';
 
 function Home() {
   const navigate = useNavigate();
@@ -41,6 +43,41 @@ function Home() {
 
   const handleHome = () => {
     navigate("/");
+  };
+  
+  const handleLogout = () => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You will be logged out of your account",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, log out!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Clear all authentication data from localStorage
+        localStorage.removeItem("isAuth");
+        localStorage.removeItem("user");
+        localStorage.removeItem("name");
+        localStorage.removeItem("key");
+        localStorage.removeItem("addr");
+        localStorage.removeItem("gender");
+        
+        // Update state
+        setIsVerified(false);
+        
+        // Show success message
+        Swal.fire(
+          'Logged Out!',
+          'You have been logged out successfully.',
+          'success'
+        );
+        
+        // Navigate to home page
+        navigate("/");
+      }
+    });
   };
 
   return (
@@ -210,6 +247,31 @@ function Home() {
                 </IconButton>
               </Tooltip>
             </Grid>)}
+            {isVerified && (
+            <Grid item>
+              <Tooltip title="Logout">
+                <IconButton color="inherit" onClick={handleLogout}>
+                  <LogoutIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>)}
+            {!isVerified && (
+            <Typography
+              variant="body"
+              component="div"
+              sx={{
+                cursor: "pointer",
+                color: "white",
+                fontSize: "18px",
+                p: 1.5,
+              }}
+              onClick={() => {
+                navigate("/login");
+              }}
+            >
+              Login
+            </Typography>
+            )}
           </Grid>
         </Toolbar>
       </AppBar>
